@@ -59,12 +59,22 @@ func main() {
 		}
 	}()
 
-	// Initialize verifiers
+	// Initialize verifiers in explicit order
+	// Verifiers are executed sequentially and any failure stops the verification chain
 	verifiers := []verifier.Verifier{
+		// Order 1: Global Verifier - Validates request format and required fields
 		exact.NewGlobalVerifier(logger),
+
+		// Order 2: Payment Context Verifier - Validates protocol version, scheme, and network
 		exact.NewPaymentContextVerifier(logger, web3Client),
+
+		// Order 3: EIP-3009 Asset Verifier - Validates token contract supports EIP-3009
 		exact.NewEIP3009AssetVerifier(logger, web3Client),
+
+		// Order 4: Signature Verifier - Validates EIP-712 authorization signature
 		exact.NewSignatureVerifier(logger, web3Client),
+
+		// Order 5: User Balance Verifier - Validates user has sufficient balance
 		exact.NewUserBalanceVerifier(logger, web3Client),
 	}
 

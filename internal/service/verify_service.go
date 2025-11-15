@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"sort"
 	"x402-facilitator-go/internal/models"
 	"x402-facilitator-go/internal/verifier"
 	"x402-facilitator-go/pkg/errors"
@@ -18,11 +17,6 @@ type VerifyService struct {
 
 // NewVerifyService creates a new VerifyService
 func NewVerifyService(verifiers []verifier.Verifier, logger *zap.Logger) *VerifyService {
-	// Sort verifiers by order
-	sort.Slice(verifiers, func(i, j int) bool {
-		return verifiers[i].Order() < verifiers[j].Order()
-	})
-
 	logger.Debug("Verify service initialized",
 		zap.Int("verifierCount", len(verifiers)),
 	)
