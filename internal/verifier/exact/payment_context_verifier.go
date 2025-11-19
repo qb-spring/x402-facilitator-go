@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/big"
 	"strings"
+	"time"
 	"x402-facilitator-go/internal/models"
 	"x402-facilitator-go/internal/verifier"
 	"x402-facilitator-go/internal/web3"
@@ -104,23 +105,23 @@ func (p *PaymentContextVerifier) Verify(ctx context.Context, request *models.Ver
 		)
 	}
 
-	// // Validate validAfter and validBefore (decimal strings, validBefore > validAfter)
-	// validAfter, _ := new(big.Int).SetString(authorization.ValidAfter, 10)
-	// validBefore, _ := new(big.Int).SetString(authorization.ValidBefore, 10)
-	// // Validate current time falls within [validAfter, validBefore]
-	// now := big.NewInt(time.Now().Unix())
-	// if now.Cmp(validAfter) <= 0 {
-	// 	return verifier.Fail(
-	// 		errors.ErrorInvalidExactEVMPayloadAuthorizationValidAfter,
-	// 		fmt.Sprintf("Authorization not yet valid: now=%d <= validAfter=%s", now, authorization.ValidAfter),
-	// 	)
-	// }
-	// if now.Cmp(validBefore) >= 0 {
-	// 	return verifier.Fail(
-	// 		errors.ErrorInvalidExactEVMPayloadAuthorizationValidBefore,
-	// 		fmt.Sprintf("Authorization expired: now=%d >= validBefore=%s", now, authorization.ValidBefore),
-	// 	)
-	// }
+	// Validate validAfter and validBefore (decimal strings, validBefore > validAfter)
+	validAfter, _ := new(big.Int).SetString(authorization.ValidAfter, 10)
+	validBefore, _ := new(big.Int).SetString(authorization.ValidBefore, 10)
+	// Validate current time falls within [validAfter, validBefore]
+	now := big.NewInt(time.Now().Unix())
+	if now.Cmp(validAfter) <= 0 {
+		return verifier.Fail(
+			errors.ErrorInvalidExactEVMPayloadAuthorizationValidAfter,
+			fmt.Sprintf("Authorization not yet valid: now=%d <= validAfter=%s", now, authorization.ValidAfter),
+		)
+	}
+	if now.Cmp(validBefore) >= 0 {
+		return verifier.Fail(
+			errors.ErrorInvalidExactEVMPayloadAuthorizationValidBefore,
+			fmt.Sprintf("Authorization expired: now=%d >= validBefore=%s", now, authorization.ValidBefore),
+		)
+	}
 
 	return verifier.OK()
 }
